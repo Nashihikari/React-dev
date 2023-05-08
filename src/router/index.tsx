@@ -11,8 +11,8 @@ import { Navigate } from "react-router-dom";
 const Weld = lazy( ()=>import("@/views/Weld.tsx") )
 const Camera = lazy( ()=>import("@/views/Camera.tsx") )
 const Robot = lazy(()=>import("@/views/Robot.tsx"))
-
-
+const RobotInfoHard = lazy(()=>import("@/views/RobotViews/pageHardInfo.tsx"))
+const RobotHome = lazy(()=>import("@/views/RobotViews/home.tsx"))
 const withLoadingComponent = (comp:JSX.Element) => (
     <React.Suspense fallback={
         <div style={{textAlign: "center", padding: 300}}>
@@ -26,7 +26,7 @@ const withLoadingComponent = (comp:JSX.Element) => (
 const routes = [
     {
         path:"/",
-        element: <Navigate to="/home"/>
+        element: <Navigate to="/robot"/>
     },
     {
         path:"/home",
@@ -38,7 +38,17 @@ const routes = [
         children:[
             {
                 path: "/robot",
-                element: withLoadingComponent(<Robot />)
+                element: withLoadingComponent(<Robot />),
+                children:[
+                    {
+                        path:"/robot/home",
+                        element: withLoadingComponent(<RobotHome/>)
+                    },
+                    {
+                        path: "/robot/info/hard",
+                        element: withLoadingComponent(<RobotInfoHard/>)
+                    }
+                ]
             },
             {
                 path:"/weld",
@@ -49,6 +59,10 @@ const routes = [
                 element:withLoadingComponent(<Camera />)
             }
         ]
+    },
+    {
+        path: "*",
+        element: <Navigate to="/robot"/>
     }
 ]
 export default routes

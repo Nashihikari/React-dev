@@ -1,14 +1,12 @@
 import {Breadcrumb, Layout, Menu, MenuProps, theme, Button, message, Steps } from "antd";
+import { Canvas } from "@react-three/fiber"
+import React, { useState, Suspense } from "react";
+import {LaptopOutlined, NotificationOutlined, UserOutlined } from "@ant-design/icons";
+import { Cloud, Sky } from "@react-three/drei";
+import {useDispatch, useSelector} from "react-redux";
+import WeldApp from "@/threeComponents/WeldComp";
 
-import React, { useState } from "react";
-import {LaptopOutlined, NotificationOutlined, UserOutlined,   VideoCameraOutlined,
-  UploadOutlined,
-  BarChartOutlined,
-  CloudOutlined,
-  AppstoreOutlined,
-  TeamOutlined,
-  ShopOutlined,
-} from "@ant-design/icons";
+
 const { Content, Sider } = Layout;
 
 // define steps items
@@ -27,33 +25,6 @@ const steps = [
   },
 ];
 
-// define items2 in sider
-// const items2: MenuProps['items'] = [
-//   UserOutlined,
-//   VideoCameraOutlined,
-//   UploadOutlined,
-//   BarChartOutlined,
-//   CloudOutlined,
-//   AppstoreOutlined,
-//   TeamOutlined,
-//   ShopOutlined,
-//     UploadOutlined,
-//   BarChartOutlined,
-//   CloudOutlined,
-//   AppstoreOutlined,
-//   TeamOutlined,
-//   ShopOutlined,
-//     UploadOutlined,
-//   BarChartOutlined,
-//   CloudOutlined,
-//   AppstoreOutlined,
-//   TeamOutlined,
-//   ShopOutlined
-// ].map((icon, index) => ({
-//   key: String(index + 1),
-//   icon: React.createElement(icon),
-//   label: `nav ${index + 1}`,
-// }));
 const items2: MenuProps['items'] = [UserOutlined, LaptopOutlined, NotificationOutlined].map(
     (icon, index) => {
         const key = String(index + 1);
@@ -90,6 +61,11 @@ const Weld = () => {
     const stepItems = steps.map((item) => (
         { key: item.title, title: item.title })
     );
+
+    //create a useState control current workpiece
+    const defaultName:string = "";
+    const [WorkpieceName, setWorkpiece] = useState<string>(defaultName)
+
     // return component "Weld"
     return (
         <Layout>
@@ -105,6 +81,7 @@ const Weld = () => {
             </Sider>
             <Layout style={{ padding: 0 }}>
                 <Steps current={current} items={stepItems} style={{ padding: '12px'}}/>
+
                 <Content
                     style={{
                       padding: 0,
@@ -113,6 +90,9 @@ const Weld = () => {
                       background: colorBgContainer,
                     }}
                 >
+                    <Canvas shadows camera={{ position: [0, 0, 10], fov: 30}}>
+                        <WeldApp WorkpieceName={WorkpieceName}/>
+                    </Canvas>
                 </Content>
 
             </Layout>

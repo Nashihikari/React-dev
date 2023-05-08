@@ -1,6 +1,6 @@
 import { useRoutes } from "react-router-dom";
 import router from "@/router";
-function App() {
+const App = () => {
 
     const outlet = useRoutes(router)
 
@@ -13,4 +13,4 @@ function App() {
     )
 }
 
-export default App
+export default App;
