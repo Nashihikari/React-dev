@@ -19,10 +19,10 @@ const Robot: React.FC = () => {
             <Sider width={200} style={{ background: colorBgContainer }}>
                 <RobotMenu/>
             </Sider>
-            <Layout style={{ padding: '0 24px 24px' }}>
+            <Layout style={{ padding: '24px 24px 24px' }}>
                 <Content
                     style={{
-                      padding: 24,
+                      padding: 0,
                       margin: 0,
                       minHeight: 600,
                       background: colorBgContainer,

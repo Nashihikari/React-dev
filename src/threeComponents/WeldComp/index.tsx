@@ -18,7 +18,9 @@ const WeldApp = ({WorkpieceName}) => {
         <>
             <spotLight position={[5, 0, 10]} />
             <ambientLight intensity={0.5} angle={0.3}/>
+
             <Porsche scale={1.6} position={[-0.5, -0.18, 0]} rotation={[0, Math.PI / 5, 0]} />
+
             <AccumulativeShadows position={[0, -1.16, 0]} frames={100} alphaTest={0.9} scale={10}>
                 <RandomizedLight amount={8} radius={10} ambient={0.5} position={[1, 5, -1]} />
             </AccumulativeShadows>

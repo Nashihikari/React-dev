@@ -5,7 +5,8 @@ import { PerformanceMonitor,
          Environment,
          Lightformer,
          Float,
-         useGLTF } from '@react-three/drei';
+         useGLTF,
+         Stage } from '@react-three/drei';
 import { Canvas, applyProps, useFrame } from '@react-three/fiber'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { LayerMaterial, Color, Depth } from 'lamina'
@@ -28,7 +29,8 @@ const SceneRobot = () => {
 
 function Lightformers({ positions = [2, 0, 2, 0, 2, 0, 2, 0] }) {
   const group = useRef()
-  useFrame((state, delta) => (group.current.position.z += delta * 10) > 20 && (group.current.position.z = -60))
+  useFrame((state, delta) =>
+            (group.current.position.z += delta * 10) > 20 && (group.current.position.z = -60))
   return (
     <>
       {/* Ceiling */}
@@ -46,13 +48,13 @@ function Lightformers({ positions = [2, 0, 2, 0, 2, 0, 2, 0] }) {
       <Lightformer rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[20, 1, 1]} />
       {/* Accent (red) */}
       <Float speed={5} floatIntensity={2} rotationIntensity={2}>
-        <Lightformer form="ring" color="red" intensity={1} scale={10} position={[-15, 4, -18]} target={[0, 0, 0]} />
+        <Lightformer form="ring" color="blue" intensity={1} scale={10} position={[-15, 4, -18]} target={[0, 0, 0]} />
       </Float>
       {/* Background */}
       <mesh scale={100}>
         <sphereGeometry args={[1, 64, 64]} />
         <LayerMaterial side={THREE.BackSide}>
-          <Color color="#444" alpha={1} mode="normal" />
+          <Color color="#115" alpha={1} mode="normal" />
           <Depth colorA="blue" colorB="black" alpha={0.5} mode="normal" near={0} far={300} origin={[100, 100, 100]} />
         </LayerMaterial>
       </mesh>

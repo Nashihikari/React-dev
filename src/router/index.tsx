@@ -26,7 +26,7 @@ const withLoadingComponent = (comp:JSX.Element) => (
 const routes = [
     {
         path:"/",
-        element: <Navigate to="/robot"/>
+        element: <Navigate to="/robot/home"/>
     },
     {
         path:"/home",
