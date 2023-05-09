@@ -24,7 +24,8 @@ const Robot: React.FC = () => {
                     style={{
                       padding: 0,
                       margin: 0,
-                      minHeight: 600,
+                      height: '100%',
+                      width: '100%',
                       background: colorBgContainer,
                     }}
                 >
