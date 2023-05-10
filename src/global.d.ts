@@ -9,3 +9,4 @@ declare module '*.scss';
 declare module '*.sass';
 declare module '*.styl';
 declare module 'react-app-rewire-alias';
+declare module '*.stl';

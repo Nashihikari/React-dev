@@ -19,13 +19,13 @@ enum LightType {
     RectAreaLight = 'RectAreaLight',
     SpotLight = 'SpotLight'
 }
-
+// antd应该可以提供其他方式创建
 const buttonLables = [LightType.AmbientLight, LightType.AmbientLightProbe, LightType.DirectionalLight,
 LightType.HemisphereLight, LightType.HemisphereLightProbe, LightType.PointLight,
 LightType.RectAreaLight, LightType.SpotLight]
 
 const HelloLight = () => {
-
+    // 监听canvas变化， scene变化
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const sceneRef = useRef<Three.Scene | null>(null)
 

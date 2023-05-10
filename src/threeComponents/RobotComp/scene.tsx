@@ -1,65 +1,76 @@
-import * as THREE from "three";
-import { PerformanceMonitor,
-         AccumulativeShadows,
-         RandomizedLight,
-         Environment,
-         Lightformer,
-         Float,
-         useGLTF,
-         Stage } from '@react-three/drei';
-import { Canvas, applyProps, useFrame } from '@react-three/fiber'
-import { useLayoutEffect, useRef, useState } from 'react'
-import { LayerMaterial, Color, Depth } from 'lamina'
+import { useRef, useEffect } from "react";
+import * as THREE from 'three';
+// @ts-ignore
+import { STLLoader } from "three/examples/jsm/loaders/STLLoader";
+import { workpieceScene } from "@/threeComponents/RobotComp/workpiece.ts";
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 
 
-const SceneRobot = () => {
-    const [degraded, degrade] = useState(false)
+const RobotWorld = () => {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+
+    useEffect(() => {
+        if ( canvasRef.current === null ) { return }
+
+        // @ts-ignore
+        const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer( { canvas: canvasRef.current })
+        const canvas: HTMLCanvasElement = canvasRef.current
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+        // camera setting
+        const camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(
+            30, canvas.clientWidth / canvas.clientHeight, 0.1, 1000
+        )
+        camera.position.set(2, 0, 0)
+        camera.up.set(0,0,1)
+        camera.lookAt(0,0,0)
+
+        // controls create and setting
+        const controls = new OrbitControls(camera, document.body)
+
+        // main scene create and setting
+        const scene: THREE.Scene = new THREE.Scene()
+        scene.background = new THREE.Color( 0xffffff )
+
+        // scene.add
+        scene.add(workpieceScene)
+        scene.add(controls)
+
+
+        //render
+        const render = () => {
+
+            renderer.render(scene, camera)
+            window.requestAnimationFrame(render)
+        }
+        //
+        window.requestAnimationFrame(render)
+
+        // function for reset the renderer's size
+        const handleResize = () => {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
+        }
+        handleResize() //默认打开时，即重新触发一次
+        // observer bind resizeObserver
+        const resizeObserver = new ResizeObserver( () => {
+            handleResize()
+        })
+        resizeObserver.observe(canvasRef.current)
+        // resizeHandleRef.current = handleResize //将 resizeHandleRef.current 与 useEffect() 中声明的函数进行绑定
+        return () => {
+            resizeObserver.disconnect()
+        }
+
+    }, [canvasRef]
+    )
+
 
     return (
-        <>
-            <spotLight position={[5, 0, 10]} />
-            <ambientLight intensity={0.5} />
-            <Environment frames={degraded ? 1 : Infinity} resolution={256} background blur={1}>
-                <Lightformers />
-            </Environment>
-        </>
-
+        <canvas ref={canvasRef} style={{ display: "block", width: "inherit", height: "inherit"}} ></canvas>
     )
+
 }
 
-function Lightformers({ positions = [2, 0, 2, 0, 2, 0, 2, 0] }) {
-  const group = useRef()
-  useFrame((state, delta) =>
-            (group.current.position.z += delta * 10) > 20 && (group.current.position.z = -60))
-  return (
-    <>
-      {/* Ceiling */}
-      <Lightformer intensity={0.75} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
-      <group rotation={[0, 0.5, 0]}>
-        <group ref={group}>
-          {positions.map((x, i) => (
-            <Lightformer key={i} form="circle" intensity={2} rotation={[Math.PI / 2, 0, 0]} position={[x, 4, i * 4]} scale={[3, 1, 1]} />
-          ))}
-        </group>
-      </group>
-      {/* Sides */}
-      <Lightformer intensity={4} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={[20, 0.1, 1]} />
-      <Lightformer rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={[20, 0.5, 1]} />
-      <Lightformer rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[20, 1, 1]} />
-      {/* Accent (red) */}
-      <Float speed={5} floatIntensity={2} rotationIntensity={2}>
-        <Lightformer form="ring" color="blue" intensity={1} scale={10} position={[-15, 4, -18]} target={[0, 0, 0]} />
-      </Float>
-      {/* Background */}
-      <mesh scale={100}>
-        <sphereGeometry args={[1, 64, 64]} />
-        <LayerMaterial side={THREE.BackSide}>
-          <Color color="#115" alpha={1} mode="normal" />
-          <Depth colorA="blue" colorB="black" alpha={0.5} mode="normal" near={0} far={300} origin={[100, 100, 100]} />
-        </LayerMaterial>
-      </mesh>
-    </>
-  )
-}
-
-export default SceneRobot;
+export default RobotWorld;
