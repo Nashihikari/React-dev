@@ -1,89 +1,94 @@
 import * as THREE from "three";
-import { PerformanceMonitor,
-         AccumulativeShadows,
-         RandomizedLight,
-         Environment,
-         Lightformer,
-         Float,
-         useGLTF } from '@react-three/drei';
-import { Canvas, applyProps, useFrame } from '@react-three/fiber'
-import React, { useLayoutEffect, useRef, useState } from 'react'
-import { LayerMaterial, Color, Depth } from 'lamina'
+import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
+import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import WorkpieceScene from "@/threeComponents/WeldComp/workpiece.ts";
 
+interface WorkpieceProps {
+    WorkpieceName: string | null,
+    WorkLines:  string | string[] | null,
+    TransformMatrix: number[] | null
+}
 
-const WeldApp = ({WorkpieceName}) => {
-    const [degraded, degrade] = useState(false)
+const WeldApp: React.FC<WorkpieceProps> = (props) => {
+    const canvasRef = useRef<HTMLCanvasElement | null>(null)
+    const [curScene, setScene] = useState<THREE.Scene | null>(null)
+    const [curcamera, setCamera] = useState<THREE.PerspectiveCamera | null>(null)
+
+    // 挂载基础场景， 不做任何额外场景物体的添加和变化
+    useLayoutEffect(() => {
+        if ( canvasRef.current === null ) { return }
+        // @ts-ignore
+        const renderer: THREE.WebGLRenderer = new THREE.WebGLRenderer( { canvas: canvasRef.current })
+        const canvas: HTMLCanvasElement = canvasRef.current
+        renderer.shadowMap.enabled = true;
+        renderer.shadowMap.type = THREE.PCFSoftShadowMap; // default THREE.PCFShadowMap
+        // camera setting
+        const camera: THREE.PerspectiveCamera = new THREE.PerspectiveCamera(
+            30, canvas.clientWidth / canvas.clientHeight, 0.1, 1000
+        )
+        camera.position.set(1, 0, 0)
+        camera.up.set(0,0,1)
+        camera.lookAt(0,0,0)
+        setCamera(camera)
+
+        // main scene create and setting
+        const scene = new THREE.Scene()
+        setScene(scene)
+        scene.background = new THREE.Color( 0xffffff )
+        // controls create and setting
+        const controls = new OrbitControls(camera, canvas)
+        scene.add(controls)
+
+        // AxesHelper
+        const axesHelper = new THREE.AxesHelper( 5 );
+        scene.add( axesHelper );
+        //render
+        const render = () => {
+            renderer.render(scene, camera)
+            window.requestAnimationFrame(render)
+        }
+        //
+        window.requestAnimationFrame(render)
+
+        // function for reset the renderer's size
+        const handleResize = () => {
+            camera.aspect = canvas.clientWidth / canvas.clientHeight
+            camera.updateProjectionMatrix()
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
+        }
+        handleResize() //默认打开时，即重新触发一次
+        // observer bind resizeObserver
+        const resizeObserver = new ResizeObserver( () => {
+            handleResize()
+        })
+        resizeObserver.observe(canvasRef.current)
+        // resizeHandleRef.current = handleResize //将 resizeHandleRef.current 与 useEffect() 中声明的函数进行绑定
+        return () => {
+            resizeObserver.disconnect()
+        }
+
+    }, [canvasRef]
+    )
+
+    useEffect(()=>{
+        if (props.WorkpieceName === ''){
+            return
+        }
+        const wps = WorkpieceScene(props.WorkpieceName, props.TransformMatrix)
+        curScene?.add(wps)
+        console.log(curScene)
+        return ()=>{
+            curScene?.remove(wps)
+        }
+    },[props.WorkpieceName, props.TransformMatrix])
+
+    useEffect(()=>{
+        console.log(props.TransformMatrix)
+    }, [props.TransformMatrix])
 
     return (
-        <>
-            <spotLight position={[5, 0, 10]} />
-            <ambientLight intensity={0.5} angle={0.3}/>
-
-            <Porsche scale={1.6} position={[-0.5, -0.18, 0]} rotation={[0, Math.PI / 5, 0]} />
-
-            <AccumulativeShadows position={[0, -1.16, 0]} frames={100} alphaTest={0.9} scale={10}>
-                <RandomizedLight amount={8} radius={10} ambient={0.5} position={[1, 5, -1]} />
-            </AccumulativeShadows>
-            <Environment frames={degraded ? 1 : Infinity} resolution={256} background blur={1}>
-                <Lightformers />
-            </Environment>
-            <CameraRig />
-        </>
-
+        <canvas ref={canvasRef} style={{ display: "block", width: "inherit", height: "inherit"}} ></canvas>
     )
-}
-function Porsche(props) {
-  const { scene, nodes, materials } = useGLTF('/src/assets/911-transformed.glb')
-  useLayoutEffect(() => {
-    Object.values(nodes).forEach((node) => node.isMesh && (node.receiveShadow = node.castShadow = true))
-    applyProps(materials.rubber, { color: '#222', roughness: 0.6, roughnessMap: null, normalScale: [4, 4] })
-    applyProps(materials.window, { color: 'black', roughness: 0, clearcoat: 0.1 })
-    applyProps(materials.coat, { envMapIntensity: 4, roughness: 0.5, metalness: 1 })
-    applyProps(materials.paint, { envMapIntensity: 2, roughness: 0.45, metalness: 0.8, color: '#555' })
-  }, [nodes, materials])
-  return <primitive object={scene} {...props} />
-}
 
-function Lightformers({ positions = [2, 0, 2, 0, 2, 0, 2, 0] }) {
-  const group = useRef()
-  useFrame((state, delta) =>
-      (group.current.position.z += delta * 10) > 20 && (group.current.position.z = -60))
-  return (
-    <>
-      {/* Ceiling */}
-      <Lightformer intensity={0.75} rotation-x={Math.PI / 2} position={[0, 5, -9]} scale={[10, 10, 1]} />
-      <group rotation={[0, 0.5, 0]}>
-        <group ref={group}>
-          {positions.map((x, i) => (
-            <Lightformer key={i} form="circle" intensity={2} rotation={[Math.PI / 2, 0, 0]} position={[x, 4, i * 4]} scale={[3, 1, 1]} />
-          ))}
-        </group>
-      </group>
-      {/* Sides */}
-      <Lightformer intensity={4} rotation-y={Math.PI / 2} position={[-5, 1, -1]} scale={[20, 0.1, 1]} />
-      <Lightformer rotation-y={Math.PI / 2} position={[-5, -1, -1]} scale={[20, 0.5, 1]} />
-      <Lightformer rotation-y={-Math.PI / 2} position={[10, 1, 0]} scale={[20, 1, 1]} />
-      {/* Accent (red) */}
-      <Float speed={5} floatIntensity={2} rotationIntensity={2}>
-        <Lightformer form="ring" color="red" intensity={1} scale={10} position={[-15, 4, -18]} target={[0, 0, 0]} />
-      </Float>
-      {/* Background */}
-      <mesh scale={100}>
-        <sphereGeometry args={[1, 64, 64]} />
-        <LayerMaterial side={THREE.BackSide}>
-          <Color color="#444" alpha={1} mode="normal" />
-          <Depth colorA="blue" colorB="black" alpha={0.5} mode="normal" near={0} far={300} origin={[100, 100, 100]} />
-        </LayerMaterial>
-      </mesh>
-    </>
-  )
-}
-
-function CameraRig({ v = new THREE.Vector3() }) {
-  return useFrame((state) => {
-    const t = state.clock.elapsedTime
-    state.camera.position.lerp(v.set(Math.sin(t / 5), 0, 12 + Math.cos(t / 5) / 2), 0.05)
-    state.camera.lookAt(0, 0, 0)
-  })
 }
 export default WeldApp;

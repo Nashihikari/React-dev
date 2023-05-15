@@ -35,7 +35,7 @@ const routes = [
     {
         path: "/",
         element: <Home />,
-        children:[
+        children: [
             {
                 path: "/robot",
                 element: withLoadingComponent(<Robot />),
