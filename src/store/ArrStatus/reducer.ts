@@ -1,6 +1,5 @@
 import handleArr from "./index.ts"
 import handleNum from "@/store/NumStatus";
-
 let reducer = ( state = {...handleArr.state},
                 action:{type:string, val:number} ) => {
     let newState = JSON.parse(JSON.stringify(state));
@@ -11,5 +10,4 @@ let reducer = ( state = {...handleArr.state},
     }
     return newState;
 }
-
 export default reducer;

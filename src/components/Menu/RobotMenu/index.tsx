@@ -2,10 +2,7 @@ import {MenuProps, Menu, MenuItem} from "antd";
 import {LaptopOutlined, NotificationOutlined, UserOutlined} from "@ant-design/icons";
 import React, {useState} from "react";
 import {NavigateFunction, useLocation, useNavigate} from "react-router-dom";
-
 type MenuItem = Required<MenuProps>['items'][number];
-
-
 const items: MenuItem[] = [
     {
         label: '机器人运动',
@@ -42,7 +39,6 @@ const items: MenuItem[] = [
         ]
     },
 ]
-
 const RobotMenu: React.FC = () => {
     // 导航跳转
     const navTo: NavigateFunction = useNavigate();
@@ -52,28 +48,23 @@ const RobotMenu: React.FC = () => {
     }
     //
     const currentRoute = useLocation();
-
     let firstOpenKey: string = "";
     function findKey(obj:{key:string}){
         return obj.key === currentRoute.pathname;
     }
-
     for ( let i = 0; i < items.length; i++){
         if( items[i]!['children'] && items[i]['children'].find(findKey) ){
             firstOpenKey = items[i]!.key;
             break;
         }
     }
-
     // 设置展开项初始值
     const [openKeys, setOpenKeys] = useState([firstOpenKey]);
     const handleOpenChange = (keys:string[]) => {
         console.log(keys)
-
         setOpenKeys([keys[keys.length - 1]]);
         console.log(openKeys)
     }
-
     return (
         <Menu
             mode="inline"
@@ -87,5 +78,4 @@ const RobotMenu: React.FC = () => {
         />
     )
 };
-
 export default RobotMenu;

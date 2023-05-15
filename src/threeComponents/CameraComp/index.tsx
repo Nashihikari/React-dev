@@ -3,12 +3,8 @@ import * as Three from 'three'
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 //import { RectAreaLightUniformsLib } from 'three/examples/jsm/lights/RectAreaLightUniformsLib'
 import { RectAreaLightHelper } from 'three/examples/jsm/helpers/RectAreaLightHelper'
-
 import createScene, { MaterialType } from './create-scene'
-
 import './index.scss'
-
-
 enum LightType {
     AmbientLight = 'AmbientLight',
     AmbientLightProbe = 'AmbientLightProbe',
@@ -23,32 +19,23 @@ enum LightType {
 const buttonLables = [LightType.AmbientLight, LightType.AmbientLightProbe, LightType.DirectionalLight,
 LightType.HemisphereLight, LightType.HemisphereLightProbe, LightType.PointLight,
 LightType.RectAreaLight, LightType.SpotLight]
-
 const HelloLight = () => {
     // 监听canvas变化， scene变化
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const sceneRef = useRef<Three.Scene | null>(null)
-
     const [type, setType] = useState<LightType>(LightType.AmbientLight)
-
     useEffect(() => {
-
         if (canvasRef.current === null) {
             return
         }
-
         const renderer = new Three.WebGLRenderer({ canvas: canvasRef.current as HTMLCanvasElement })
-
         const camera = new Three.PerspectiveCamera(45, 2, 0.1, 1000)
         camera.position.set(0, 10, 20)
-
         const controls = new OrbitControls(camera, canvasRef.current)
         controls.target.set(0, 5, 0)
         controls.update()
-
         const scene = createScene()
         sceneRef.current = scene
-
         const render = () => {
             if (sceneRef.current) {
                 renderer.render(sceneRef.current, camera)
@@ -56,7 +43,6 @@ const HelloLight = () => {
             window.requestAnimationFrame(render)
         }
         window.requestAnimationFrame(render)
-
         const handleResize = () => {
             const canvas = canvasRef.current
             if (canvas === null) {
@@ -68,19 +54,15 @@ const HelloLight = () => {
         }
         handleResize()
         window.addEventListener('resize', handleResize)
-
         return () => {
             window.removeEventListener('resize', handleResize)
         }
     }, [canvasRef])
-
     useEffect(() => {
         if (sceneRef.current === null) {
             return
         }
-
         sceneRef.current = null
-
         let newScene: Three.Scene
         if (type === LightType.RectAreaLight) {
             newScene = createScene(MaterialType.MESH_STANDARD_MATERIAL)
@@ -88,7 +70,6 @@ const HelloLight = () => {
             newScene = createScene()
         }
         sceneRef.current = newScene
-
         switch (type) {
             case LightType.AmbientLight:
                 const ambientLight = new Three.AmbientLight(0xFFFFFF, 1)
@@ -104,17 +85,14 @@ const HelloLight = () => {
                 directionalLight.target.position.set(-5, 0, 0)
                 newScene.add(directionalLight)
                 newScene.add(directionalLight.target)
-
                 const directionalLightHelper = new Three.DirectionalLightHelper(directionalLight)
                 newScene.add(directionalLightHelper)
                 break
             case LightType.HemisphereLight:
                 const hemisphereLight = new Three.HemisphereLight(0xB1E1FF, 0xB97A20, 1)
                 newScene.add(hemisphereLight)
-
                 const hemisphereLightHelper = new Three.HemisphereLightHelper(hemisphereLight,5)
                 newScene.add(hemisphereLightHelper)
-
                 break
             case LightType.HemisphereLightProbe:
                 const hemisphereLightProbe = new Three.HemisphereLightProbe(0xB1E1FF, 0xB97A20, 1)
@@ -124,18 +102,15 @@ const HelloLight = () => {
                 const pointLight = new Three.PointLight(0xFFFFFF, 1)
                 pointLight.position.set(0, 10, 0)
                 newScene.add(pointLight)
-
                 const pointLightHelper = new Three.PointLightHelper(pointLight)
                 newScene.add(pointLightHelper)
                 break;
             case LightType.RectAreaLight:
                 //RectAreaLightUniformsLib.init() //实际测试时发现即使不添加这行代码，场景似乎也依然正常渲染，没有看出差异
-
                 const rectAreaLight = new Three.RectAreaLight(0xFFFFFF, 5, 12, 4)
                 rectAreaLight.position.set(0, 10, 0)
                 rectAreaLight.rotation.x = Three.MathUtils.degToRad(-90)
                 newScene.add(rectAreaLight)
-
                 const rectAreaLightHelper = new RectAreaLightHelper(rectAreaLight)
                 newScene.add(rectAreaLightHelper)
                 break
@@ -145,7 +120,6 @@ const HelloLight = () => {
                 spotLight.target.position.set(-5, 0, 0)
                 newScene.add(spotLight)
                 newScene.add(spotLight.target)
-
                 const spotLightHelper = new Three.SpotLightHelper(spotLight)
                 newScene.add(spotLightHelper)
                 break
@@ -154,7 +128,6 @@ const HelloLight = () => {
                 break
         }
     }, [type])
-
     return (
         <div className='full-screen'>
             <div className='buttons'>
@@ -170,9 +143,6 @@ const HelloLight = () => {
             </div>
             <canvas ref={canvasRef} />
         </div>
-
     )
-
 }
-
 export default HelloLight

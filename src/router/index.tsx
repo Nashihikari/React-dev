@@ -7,7 +7,6 @@ import { Spin } from "antd";
 // need a Loading component 不使用全部引入, 按需进行懒路由, 接收路由指令后再加载
 // 重定向
 import { Navigate } from "react-router-dom";
-
 const Weld = lazy( ()=>import("@/views/Weld.tsx") )
 const Camera = lazy( ()=>import("@/views/Camera.tsx") )
 const Robot = lazy(()=>import("@/views/Robot.tsx"))
@@ -22,7 +21,6 @@ const withLoadingComponent = (comp:JSX.Element) => (
         {comp}
     </React.Suspense>
 )
-
 const routes = [
     {
         path:"/",

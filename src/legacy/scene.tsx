@@ -10,11 +10,8 @@ import { PerformanceMonitor,
 import { Canvas, applyProps, useFrame } from '@react-three/fiber'
 import { useLayoutEffect, useRef, useState } from 'react'
 import { LayerMaterial, Color, Depth } from 'lamina'
-
-
 const SceneRobot = () => {
     const [degraded, degrade] = useState(false)
-
     return (
         <>
             <spotLight position={[5, 0, 10]} />
@@ -23,10 +20,8 @@ const SceneRobot = () => {
                 <Lightformers />
             </Environment>
         </>
-
     )
 }
-
 function Lightformers({ positions = [2, 0, 2, 0, 2, 0, 2, 0] }) {
   const group = useRef()
   useFrame((state, delta) =>
@@ -61,5 +56,4 @@ function Lightformers({ positions = [2, 0, 2, 0, 2, 0, 2, 0] }) {
     </>
   )
 }
-
 export default SceneRobot;

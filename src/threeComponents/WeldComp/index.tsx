@@ -3,19 +3,20 @@ import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import WorkpieceScene from "@/threeComponents/WeldComp/workpiece.ts";
 import WorklinesScene from "@/threeComponents/WeldComp/worklines.ts";
-
-
+import PointCloudScene from "@/threeComponents/WeldComp/pointCloud.ts";
+/*
+*   Weld.tsx (views) -> * index.tsx (MainComponents) * -> OtherComponents
+* */
 interface WorkpieceProps {
     WorkpieceName: string | null,
     WorkLines:  string | string[] | null,
-    TransformMatrix: number[] | null
+    TransformMatrix: number[] | null,
+    PointCloud: boolean
 }
-
 const WeldApp: React.FC<WorkpieceProps> = (props) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const [curScene, setScene] = useState<THREE.Scene | null>(null)
     const [curCamera, setCamera] = useState<THREE.PerspectiveCamera | null>(null)
-
     /*
      *   挂载基础场景， 不做任何额外场景物体的添加和变化
      * */
@@ -34,7 +35,6 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
         camera.up.set(0,0,1)
         camera.lookAt(0,0,0)
         setCamera(camera)
-
         // main scene create and setting
         const scene = new THREE.Scene()
         /*
@@ -45,7 +45,6 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
         // controls create and setting
         const controls = new OrbitControls(camera, canvas)
         scene.add(controls)
-
         // AxesHelper
         const axesHelper = new THREE.AxesHelper( 5 );
         scene.add( axesHelper );
@@ -56,7 +55,6 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
         }
         //
         window.requestAnimationFrame(render)
-
         // function for reset the renderer's size
         const handleResize = () => {
             camera.aspect = canvas.clientWidth / canvas.clientHeight
@@ -73,10 +71,8 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
         return () => {
             resizeObserver.disconnect()
         }
-
     }, [canvasRef]
     )
-
     /*
     *   control workpiece scene update
     * */
@@ -89,7 +85,6 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
             curScene?.remove(wps)
         }
     },[props.WorkpieceName, props.TransformMatrix])
-
     /*
     *   导入worklines
     * */
@@ -101,18 +96,25 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
             curScene?.remove(wls)
         }
     }, [props.WorkLines])
-
-
+    /*
+    *   导入点云
+    * */
+    useEffect(()=>{
+        if(props.PointCloud === false){return}
+        const pcs = PointCloudScene(props.WorkpieceName, props.PointCloud)
+        curScene?.add(pcs)
+        return()=>{
+            curScene?.remove(pcs)
+        }
+    }, [props.PointCloud])
     /*
     *   temp hooks
     * */
     useEffect(()=>{
         console.log(props.TransformMatrix)
     }, [props.TransformMatrix])
-
     return (
         <canvas ref={canvasRef} style={{ display: "block", width: "inherit", height: "inherit"}} ></canvas>
     )
-
 }
 export default WeldApp;

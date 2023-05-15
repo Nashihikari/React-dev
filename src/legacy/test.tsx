@@ -3,20 +3,16 @@ import * as THREE from 'three';
 import { solarSystem, earthOrbit, moonOribit, pointLight, pointLightHelper } from "@/threeComponents/RobotComp/test-solar.ts";
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls'
 const nodeArr = [solarSystem, earthOrbit, moonOribit]
-
 const SceneTest:React.FC = () => {
     const canvasRef = useRef<HTMLCanvasElement>(null)
     const rendererRef = useRef<Three.WebGLRenderer | null>(null)
     const cameraRef = useRef<Three.PerspectiveCamera | null>(null)
     const sceneRef = useRef<Three.Scene | null>(null)
-
     useEffect(() => {
         if (canvasRef.current) {
-
             // renderer
             const renderer = new THREE.WebGLRenderer({ canvas: canvasRef.current as HTMLCanvasElement})
             const canvas = renderer.domElement
-
             // camera
             const camera = new THREE.PerspectiveCamera(
                 30,
@@ -28,15 +24,12 @@ const SceneTest:React.FC = () => {
             camera.up.set(0,1,0)
             camera.lookAt(0,0,0)
             cameraRef.current = camera
-
             // controls
             const controls = new OrbitControls(camera, document.body)
-
             // scene
             const scene = new THREE.Scene()
             scene.background = new THREE.Color(0x000000)
             sceneRef.current = scene
-
             // add solar System
             scene.add(solarSystem)
             scene.add(pointLight)
@@ -54,7 +47,6 @@ const SceneTest:React.FC = () => {
                 window.requestAnimationFrame(render)
             }
             window.requestAnimationFrame(render)
-
             nodeArr.map(element => {
                 const axes = new THREE.AxesHelper()
                 const material = axes.material as THREE.Material
@@ -62,7 +54,6 @@ const SceneTest:React.FC = () => {
                 axes.renderOrder = 0
                 element.add(axes)
             })
-
             // resize canvas
             const handleResize = () => {
                 const canvas = renderer.domElement
@@ -71,7 +62,6 @@ const SceneTest:React.FC = () => {
                 renderer.setSize(canvas.clientWidth, canvas.clientHeight, false)
             }
             handleResize() //默认打开时，即重新触发一次
-
             const resizeObserver = new ResizeObserver( () => {
                 handleResize()
             })
@@ -80,15 +70,10 @@ const SceneTest:React.FC = () => {
             return () => {
                 resizeObserver.disconnect()
             }
-
         }
-
     }, [canvasRef])
-
-
     return (
         <canvas ref={canvasRef}  style={{ display: "block", width: "inherit", height: "inherit"}}/>
     )
 };
-
 export default SceneTest;

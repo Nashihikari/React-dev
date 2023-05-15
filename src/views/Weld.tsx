@@ -1,12 +1,13 @@
-import {Select, Space, Breadcrumb, Layout, Menu, MenuProps, theme, Button, message, Steps, SelectProps} from "antd";
+import {Select, Space, Breadcrumb, Layout, Menu, MenuProps, theme, Button, message, Steps, SelectProps, notification} from "antd";
 import { Canvas } from "@react-three/fiber"
 import React, {useState, Suspense, useEffect} from "react";
 import {LaptopOutlined, NotificationOutlined, UserOutlined } from "@ant-design/icons";
 import {useDispatch, useSelector} from "react-redux";
 import WeldApp from "@/threeComponents/WeldComp";
 import {values} from "./object";
-import {RequestR1} from "@/threeComponents/WeldComp/request.ts";
-
+import {RequestWorkpiece, RequestCamera, RequestWorklines, RequestWeld} from "@/threeComponents/WeldComp/request.ts";
+import type { NotificationPlacement } from 'antd/es/notification/interface';
+import PointCloudScene from "@/threeComponents/WeldComp/pointCloud.ts";
 
 const { Content, Sider } = Layout;
 
@@ -15,7 +16,7 @@ const { Content, Sider } = Layout;
 * */
 const options: SelectProps['options'] = [];
 const optArrLabel: string[] = ['法奥H型工件', '其他工件']
-const optArrVal: string[] = ['FAIRWorkpiece.stl', 'OtherWorkpiece.stl']
+const optArrVal: string[] = ['HFair.stl', 'OtherWorkpiece.stl']
 for ( let i = 0; i < optArrLabel.length; i++ ){
     options.push(
         {
@@ -81,11 +82,36 @@ const Weld = () => {
     const [transMat, setTransMat] = useState<number[] | null>(null);
     const [workPiece, setWorkPiece] = useState<string | null>(null);
     const [workLines, setWorkLines] = useState<string[]|string|null>(null);
+    const [pointCloud, setPointCloud] = useState(false)
     /*
     *   当前步骤编号 current
     *
     * */
     const [current, setCurrent] = useState(0);
+
+    const openNotification = () => {
+      const placement = 'topLeft'
+      const btn = (
+      <Space>
+        <Button type="primary" size="small" onClick={()=> {
+            setCurrent(current)
+            notification.destroy()
+        }}>
+          上一步
+        </Button>
+      </Space>
+    );
+      notification.error({
+        message: '优复博智能焊接系统',
+        description:
+          '本次操作失败,请检查原因,然后返回上一步重试.',
+        placement,
+        btn,
+        onClick: () => {
+          console.log('操作异常!');
+        },
+      });
+    };
 
     /*
     *   Next逻辑
@@ -95,19 +121,43 @@ const Weld = () => {
     const next = () => {
         if (current === 0){
             // @ts-ignore
-            // RequestWorkpiece(workPiece)
+            if(RequestWorkpiece(workPiece)){ console.log(true) }
+            else {
+                console.log(false)
+                openNotification()
+            }
         }
         else if (current === 1){
-            const curTransMat = RequestR1(workPiece)
-            setTransMat(curTransMat)
+            const curTransMat = RequestCamera(workPiece)
+            if(curTransMat) {
+                setTransMat(curTransMat)
+                setPointCloud(true)
+            }
+            else{
+                console.log(false)
+                openNotification()
+            }
         }
         else if (current === 2){
-            // @ts-ignore
-            // RequestWorkLines(workLines)
+            if(RequestWorklines(workPiece, workLines)){
+                console.log(true)
+            }
+            else {
+                console.log(false)
+                openNotification()
+            }
         }
         else if (current === 3){
-            // @ts-ignore
-            // RequestRun()
+            console.log('weld-------')
+            if(RequestWeld(workPiece)){
+                console.log(true)
+                return
+            }
+            else {
+                console.log(false)
+                openNotification()
+                return
+            }
         }
         setCurrent(current + 1);
 
@@ -222,6 +272,7 @@ const Weld = () => {
                         current === stepItems.length - 1 && (<Button
                             type="primary"
                             style={{margin: '20px 0 0 34px', width: '40%'}}
+                            onClick={() => next()}
                         >执行</Button>)
                     }
                 </div>
@@ -238,7 +289,7 @@ const Weld = () => {
                       background: '#eee',
                     }}
                 >
-                    <WeldApp WorkpieceName={workPiece} WorkLines={workLines} TransformMatrix={transMat}  />
+                    <WeldApp WorkpieceName={workPiece} WorkLines={workLines} TransformMatrix={transMat} PointCloud={pointCloud}/>
                 </Content>
             </Layout>
         </Layout>

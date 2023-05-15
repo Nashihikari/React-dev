@@ -3,8 +3,6 @@ import { MTLLoader } from "three/examples/jsm/loaders/MTLLoader";
 import { OBJLoader } from "three/examples/jsm/loaders/OBJLoader"
 import * as THREE from 'three';
 import WorkpieceScene from "@/threeComponents/WeldComp/workpiece.ts";
-
-
 /*
 *   场景中导入选择的worklines
 *   Parameter :
@@ -21,9 +19,8 @@ const WorklinesScene = (workpieceName: string | null, worklines: string[] | stri
         const workpiecePath: string = workpieceName.split('.')[0]
         fileLoadPath = '/src/assets/workpiece/' + workpiecePath + '/'
         fileLoader.setPath(fileLoadPath)
-
     }else {
-        const workpiecePath: string = 'FAIRWorkpiece.stl'.split('.')[0]
+        const workpiecePath: string = 'HFair.stl'.split('.')[0]
         fileLoadPath = '/src/assets/workpiece/' + workpiecePath + '/'
         fileLoader.setPath(fileLoadPath)
     }
@@ -50,9 +47,7 @@ const WorklinesScene = (workpieceName: string | null, worklines: string[] | stri
         })
     }
     else{
-
     }
     return (worklinesScene)
 }
-
 export default WorklinesScene
