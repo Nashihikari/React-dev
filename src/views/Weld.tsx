@@ -15,7 +15,7 @@ const { Content, Sider } = Layout;
 * */
 const options: SelectProps['options'] = [];
 const optArrLabel: string[] = ['法奥H型工件', '其他工件']
-const optArrVal: string[] = ['untitled.stl', 'OtherWorkpiece.stl']
+const optArrVal: string[] = ['FAIRWorkpiece.stl', 'OtherWorkpiece.stl']
 for ( let i = 0; i < optArrLabel.length; i++ ){
     options.push(
         {
@@ -80,7 +80,7 @@ const Weld = () => {
     const [optDabWl, setOptDabWl] = useState(true);
     const [transMat, setTransMat] = useState<number[] | null>(null);
     const [workPiece, setWorkPiece] = useState<string | null>(null);
-    const [workLines, setWorkLines] = useState('');
+    const [workLines, setWorkLines] = useState<string[]|string|null>(null);
     /*
     *   当前步骤编号 current
     *
@@ -89,34 +89,43 @@ const Weld = () => {
 
     /*
     *   Next逻辑
-    *   按步骤调用请求函数
+    *   $按步骤调用 $请求函数$
+    *   current: 0 select
     * */
     const next = () => {
         if (current === 0){
-
+            // @ts-ignore
+            // RequestWorkpiece(workPiece)
         }
         else if (current === 1){
             const curTransMat = RequestR1(workPiece)
             setTransMat(curTransMat)
         }
         else if (current === 2){
-
+            // @ts-ignore
+            // RequestWorkLines(workLines)
         }
         else if (current === 3){
-
+            // @ts-ignore
+            // RequestRun()
         }
         setCurrent(current + 1);
 
     };
+    /*
+    *   prev 逻辑
+    *   按步骤调撤回本步骤设置
+    *
+    * */
     const prev = () => {
         if (current === 1){
-            setWorkPiece('')
+            setWorkPiece(null)
         }
         else if (current === 2){
             setTransMat(null)
         }
         else if (current === 3){
-            setWorkLines('')
+            setWorkLines(null)
         }
         setCurrent(current - 1);
     };

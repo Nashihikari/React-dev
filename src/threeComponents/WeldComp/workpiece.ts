@@ -28,17 +28,17 @@ const WorkpieceScene = (workpieceName: string | null, transMatrix:number[] | nul
     const objLoader = new OBJLoader()
     const fileLoader = new THREE.FileLoader()
     // load all work lines
-    objLoader.setPath('/src/assets/FAIROBJ/')
-
-
+    // objLoader.setPath('/src/assets/FAIROBJ/')
 
     /*
     *   $加载工件模型$
     * */
-    if (workpieceName !== '') {
-        stlLoader.setPath('/src/assets/')
+    if (workpieceName) {
+        const workpiecePath: string = workpieceName.split('.')[0]
+        const stlLoadPath = '/src/assets/workpiece/' + workpiecePath + '/'
+        stlLoader.setPath(stlLoadPath)
         // @ts-ignore
-        stlLoader.load(workpieceName,
+        stlLoader.load('workpiece.stl',
             (workpiece) => {
                 // work-piece
                 const workpieceMesh: THREE.Mesh = new THREE.Mesh(workpiece, meshMat)
@@ -52,25 +52,6 @@ const WorkpieceScene = (workpieceName: string | null, transMatrix:number[] | nul
             }
         )
     }
-    /*
-    *   $可视化焊缝$
-    * */
-    fileLoader.setPath('/src/assets/workpiece/')
-    fileLoader.load('FAIRWorkpiece/lines.json', (linesJSON)=>{
-        let linesOBJ = JSON.parse(linesJSON)
-        for (let key in linesOBJ)
-        {
-            const v1 = new THREE.Vector3(linesOBJ[key][0][0], linesOBJ[key][0][1], linesOBJ[key][0][2]);
-            const v2 = new THREE.Vector3(linesOBJ[key][1][0], linesOBJ[key][1][1], linesOBJ[key][1][2]);
-            const line = new THREE.LineCurve3(v1, v2);
-            console.log(line)
-            const lineTube = new THREE.TubeGeometry(line, 20, 0.002, 8, true);
-            const materialTube = new THREE.MeshBasicMaterial( { color: 0xeee } );
-            const tubeMesh = new THREE.Mesh( lineTube, materialTube );
-            workpieceScene.add(tubeMesh)
-        }
-        // for ( let i = 0; i < linesJSON.length)
-    })
 
     // plane
     const geometry = new THREE.PlaneGeometry( 1, 1 );
@@ -95,7 +76,7 @@ const WorkpieceScene = (workpieceName: string | null, transMatrix:number[] | nul
     plane.receiveShadow = true;
 
     if (transMatrix){
-
+        const mat4 = new THREE.Matrix4()
         // workpieceScene.applyMatrix4()
     }
 

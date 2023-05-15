@@ -2,6 +2,8 @@ import * as THREE from "three";
 import React, {useEffect, useLayoutEffect, useRef, useState} from 'react'
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import WorkpieceScene from "@/threeComponents/WeldComp/workpiece.ts";
+import WorklinesScene from "@/threeComponents/WeldComp/worklines.ts";
+
 
 interface WorkpieceProps {
     WorkpieceName: string | null,
@@ -12,9 +14,11 @@ interface WorkpieceProps {
 const WeldApp: React.FC<WorkpieceProps> = (props) => {
     const canvasRef = useRef<HTMLCanvasElement | null>(null)
     const [curScene, setScene] = useState<THREE.Scene | null>(null)
-    const [curcamera, setCamera] = useState<THREE.PerspectiveCamera | null>(null)
+    const [curCamera, setCamera] = useState<THREE.PerspectiveCamera | null>(null)
 
-    // 挂载基础场景， 不做任何额外场景物体的添加和变化
+    /*
+     *   挂载基础场景， 不做任何额外场景物体的添加和变化
+     * */
     useLayoutEffect(() => {
         if ( canvasRef.current === null ) { return }
         // @ts-ignore
@@ -33,6 +37,9 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
 
         // main scene create and setting
         const scene = new THREE.Scene()
+        /*
+        *  将 main scene 对外可见
+        * */
         setScene(scene)
         scene.background = new THREE.Color( 0xffffff )
         // controls create and setting
@@ -70,10 +77,11 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
     }, [canvasRef]
     )
 
+    /*
+    *   control workpiece scene update
+    * */
     useEffect(()=>{
-        if (props.WorkpieceName === ''){
-            return
-        }
+        if (props.WorkpieceName === null){ return }
         const wps = WorkpieceScene(props.WorkpieceName, props.TransformMatrix)
         curScene?.add(wps)
         console.log(curScene)
@@ -82,6 +90,22 @@ const WeldApp: React.FC<WorkpieceProps> = (props) => {
         }
     },[props.WorkpieceName, props.TransformMatrix])
 
+    /*
+    *   导入worklines
+    * */
+    useEffect( ()=>{
+        if (props.WorkLines === null){ return }
+        const wls = WorklinesScene(props.WorkpieceName, props.WorkLines, props.TransformMatrix)
+        curScene?.add(wls)
+        return () => {
+            curScene?.remove(wls)
+        }
+    }, [props.WorkLines])
+
+
+    /*
+    *   temp hooks
+    * */
     useEffect(()=>{
         console.log(props.TransformMatrix)
     }, [props.TransformMatrix])
