@@ -1,0 +1,7 @@
+# Blender v3.1.2 OBJ File: ''
+# www.blender.org
+mtllib lines-3.mtl
+o test2.002
+v -0.037653 0.114675 -0.037143
+v -0.037653 -0.080025 -0.037143
+l 1 2

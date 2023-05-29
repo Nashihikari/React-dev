@@ -1,0 +1,7 @@
+# Blender v3.1.2 OBJ File: ''
+# www.blender.org
+mtllib lines-4.mtl
+o workpiece.004
+v -0.036499 0.114625 0.057843
+v -0.036499 -0.080375 0.057843
+l 1 2

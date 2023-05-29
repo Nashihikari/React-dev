@@ -2,6 +2,8 @@ import {Breadcrumb, Layout, Menu, MenuProps, theme} from "antd";
 
 import React from "react";
 import {LaptopOutlined, NotificationOutlined, UserOutlined} from "@ant-design/icons";
+import HelloLight from "@/threeComponents/CameraComp/index.tsx"
+
 const { Content, Sider } = Layout;
 
 
@@ -40,19 +42,15 @@ const Camera = () => {
                 />
             </Sider>
             <Layout style={{ padding: '0 24px 24px' }}>
-                <Breadcrumb style={{ margin: '16px 0' }}>
-                    <Breadcrumb.Item>Home</Breadcrumb.Item>
-                    <Breadcrumb.Item>List</Breadcrumb.Item>
-                    <Breadcrumb.Item>App</Breadcrumb.Item>
-                </Breadcrumb>
                 <Content
                     style={{
-                      padding: 24,
+                      padding: 0,
                       margin: 0,
                       minHeight: 600,
                       background: colorBgContainer,
                     }}
                 >
+                    <HelloLight/>
                 </Content>
             </Layout>
         </Layout>

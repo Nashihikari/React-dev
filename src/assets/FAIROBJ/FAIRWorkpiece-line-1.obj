@@ -1,0 +1,7 @@
+# Blender v3.1.2 OBJ File: 'FAIRWorkpiece.blend'
+# www.blender.org
+mtllib FAIRWorkpiece-line-1.mtl
+o FAIRWorkpiece.002_FAIRWorkpiece.003
+v 0.070599 0.002151 -0.097253
+v -0.068401 0.002151 -0.097253
+l 1 2
