@@ -8,15 +8,21 @@ import {values} from "./object";
 import {RequestWorkpiece, RequestCamera, RequestWorklines, RequestWeld} from "@/threeComponents/WeldComp/request.ts";
 import type { NotificationPlacement } from 'antd/es/notification/interface';
 import PointCloudScene from "@/threeComponents/WeldComp/pointCloud.ts";
+import {OptionsWorkpieceLoader, OptionsWorklinesLoader} from '@/threeComponents/WeldComp/config/JSONLoader.ts'
 
 const { Content, Sider } = Layout;
 
+const workpieceOptionsLoad = OptionsWorkpieceLoader()
+
 /*  Create options for *selecting the work-piece*
-*
+*   day: 5-31 修改成读取json模式
 * */
 const options: SelectProps['options'] = [];
-const optArrLabel: string[] = ['法奥H型工件', 'TEST1','TEST2','其他工件']
-const optArrVal: string[] = ['HFair.stl','TEST1.stl','TEST2.stl' ,'OtherWorkpiece.stl']
+console.log(workpieceOptionsLoad.keyArray)
+console.log(workpieceOptionsLoad.valueArray)
+
+const optArrLabel: string[] = workpieceOptionsLoad.keyArray // ['法奥H型工件', 'TEST1','TEST2','其他工件']
+const optArrVal: string[] = workpieceOptionsLoad.valueArray // ['HFair.stl','TEST1.stl','TEST2.stl' ,'OtherWorkpiece.stl']
 for ( let i = 0; i < optArrLabel.length; i++ ){
     options.push(
         {
@@ -26,20 +32,6 @@ for ( let i = 0; i < optArrLabel.length; i++ ){
     )
 }
 
-/*  Create options for *selecting the work-piece's weld lines*
-*
-* */
-const optionsLines: SelectProps['options'] = [];
-const optLinesArrLabel: string[] = ['焊缝1', '焊缝2','焊缝3', '焊缝4', '焊缝5', '焊缝6']
-const optLinesArrVal: string[] = ['1', '2', '3', '4','5','6']
-for ( let i = 0; i < optLinesArrLabel.length; i++ ){
-    optionsLines.push(
-        {
-            label: optLinesArrLabel[i],
-            value: optLinesArrVal[i]
-        }
-    )
-}
 /* define steps items
 *  定义步骤线
 * */
@@ -49,21 +41,22 @@ const steps = [
     content: '1',
   },
   {
-    title: '焊缝识别',
+    title: '拍照',
     content: '2',
   },
   {
+      title: '焊缝识别',
+      content: '3'
+  },
+  {
     title: '焊缝选择',
-    content: '3',
+    content: '4',
   },
   {
       title: '执行',
-    content: '4',
+    content: '5',
   }
 ];
-
-
-
 
 
 const Weld = () => {
@@ -83,6 +76,11 @@ const Weld = () => {
     const [workPiece, setWorkPiece] = useState<string | null>(null);
     const [workLines, setWorkLines] = useState<string[]|string|null>(null);
     const [pointCloud, setPointCloud] = useState(false)
+    /*
+    *   define optionsLines
+    * */
+    const [optionsLines, setOptionsLines] = useState<SelectProps['options']>([])
+
     /*
     *   当前步骤编号 current
     *
@@ -180,6 +178,7 @@ const Weld = () => {
         }
         setCurrent(current - 1);
     };
+
     // load step items
     const stepItems = steps.map((item) => (
         { key: item.title, title: item.title })
@@ -189,8 +188,33 @@ const Weld = () => {
     *   工件选择逻辑 Hooks
     * */
     const handleChangeWp = ( value: string ) => {
+
         console.log(`selected ${value}`);
         setWorkPiece(`${value}`);
+
+        /*  Create options for * selecting the work-piece's weld lines *
+        *   结构：key: num, value: linesArray
+        *   reference: optArrLabel to find files name
+        *   day: 5-31 修改成读取json模式
+        * */
+        const optionsLinesReplace: SelectProps['options'] = []
+
+        const optionsWorklinesLoad = OptionsWorklinesLoader(`${value}`)
+
+        let optLinesArrVal: string[] = optionsWorklinesLoad
+        console.log(optLinesArrVal)
+        console.log(optionsWorklinesLoad.length)
+        for ( let i = 0; i < optLinesArrVal.length; i++ ){
+            console.log(optLinesArrVal[i].toString())
+            optionsLinesReplace.push(
+                {
+                    label: '焊缝' + optLinesArrVal[i].toString(),
+                    value: optLinesArrVal[i]
+                }
+            )
+        }
+        setOptionsLines(optionsLinesReplace)
+
     }
 
     /*
@@ -201,6 +225,7 @@ const Weld = () => {
         setWorkLines(`${value}`);
     }
 
+
     /*
     *   设置下拉选择窗口可选性
     * */
@@ -210,7 +235,7 @@ const Weld = () => {
         }else {
             setOptDabWp(true)
         }
-        if (current === 2) {
+        if (current === 3) {
             setOptDabWl(false)
         }else {
             setOptDabWl(true)

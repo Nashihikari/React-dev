@@ -1,3 +1,4 @@
+import fs from 'fs'
 /*
 *   request: use R1
 *       legacy: cmd 1105
@@ -6,7 +7,7 @@ const RequestR1 = (workpiece:string)=>{
     try{
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/cmd'
+        const tarUrl = 'http://127.0.0.1:3010/'
         // 同步请求
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
@@ -28,23 +29,65 @@ const RequestR1 = (workpiece:string)=>{
         return false
     }
 }
+
 /*
 *   request: send workpiece
 *       legacy: cmd 1101
 * */
+// export const RequestWorkpiece = (workpiece: string) =>{
+//     try{
+//         const formData = new FormData()
+//         const xlr = new XMLHttpRequest()
+//         const tarUrl = 'http://127.0.0.1:3010/cmd'
+//         // 同步请求
+//         xlr.open("POST", tarUrl, false)
+//         formData.append('filename', workpiece)
+//         const cmdHead = '/f/bIII1III1101III'
+//         const data = 'send workpiece name'
+//         const len = '4'
+//         const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
+//         formData.append('cmd', sendCmd)
+//         xlr.send(formData)
+//         const Response = JSON.parse(xlr.response)
+//         if (Response['result'] === 'success'){
+//             return true
+//         }else{
+//             return false
+//         }
+//     }
+//     catch (err){
+//         console.log(err)
+//         return false
+//     }
+// }
+
+/*
+*   request: send workpiece
+*   /upload_workpiece
+*       legacy: cmd 1101
+* */
 export const RequestWorkpiece = (workpiece: string) =>{
     try{
+        let fileData = null;
+        const url = '/src/assets/workpiece/HFair/workpiece.stl'
+        let xhr = new XMLHttpRequest()
+        xhr.open('GET', url, false)
+        xhr.send();
+        if (xhr.status === 200) {
+            const data = xhr.responseText;
+            console.log(data);
+            fileData = data
+        } else {
+            console.error('Failed to load data');
+        }
+
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/cmd'
+        const tarUrl = 'http://192.168.31.147:3010/upload_workpiece'
         // 同步请求
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
-        const cmdHead = '/f/bIII1III1101III'
-        const data = 'send workpiece name'
-        const len = '4'
-        const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
-        formData.append('cmd', sendCmd)
+        formData.append('file', fileData)
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
         if (Response['result'] === 'success'){
@@ -58,6 +101,7 @@ export const RequestWorkpiece = (workpiece: string) =>{
         return false
     }
 }
+
 /*
 *   request: send work lines
 *       legacy: cmd 1107
