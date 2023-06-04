@@ -32,8 +32,39 @@ const RequestR1 = (workpiece:string)=>{
 
 /*
 *   request: send workpiece
-*   url: /upload_workpiece
-*
+*       legacy: cmd 1101
+* */
+// export const RequestWorkpiece = (workpiece: string) =>{
+//     try{
+//         const formData = new FormData()
+//         const xlr = new XMLHttpRequest()
+//         const tarUrl = 'http://127.0.0.1:3010/cmd'
+//         // 同步请求
+//         xlr.open("POST", tarUrl, false)
+//         formData.append('filename', workpiece)
+//         const cmdHead = '/f/bIII1III1101III'
+//         const data = 'send workpiece name'
+//         const len = '4'
+//         const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
+//         formData.append('cmd', sendCmd)
+//         xlr.send(formData)
+//         const Response = JSON.parse(xlr.response)
+//         if (Response['result'] === 'success'){
+//             return true
+//         }else{
+//             return false
+//         }
+//     }
+//     catch (err){
+//         console.log(err)
+//         return false
+//     }
+// }
+
+/*
+*   request: send workpiece
+*   /upload_workpiece
+*       legacy: cmd 1101
 * */
 export const RequestWorkpiece = (workpiece: string) =>{
     try{
@@ -47,7 +78,7 @@ export const RequestWorkpiece = (workpiece: string) =>{
         formData.append('filepath', workpiecePath)
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
-        if (Response['msg'] === 'success'){
+        if (Response['result'] === 'success'){
             return true
         }else{
             return false
@@ -58,88 +89,6 @@ export const RequestWorkpiece = (workpiece: string) =>{
         return false
     }
 }
-
-/*
-*   request: Move Far Shot And Take Photo
-*   url: /move_far_shot_and_take_photo
-*
-* */
-export const RequestMoveFarShotAndTakePhoto = (workpiece: string) => {
-    try{
-        const formData = new FormData()
-        const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/move_far_shot_and_take_photo'
-        xlr.open("POST", tarUrl, false)
-        formData.append('filename', workpiece)
-        xlr.send(formData)
-        const Response = JSON.parse(xlr.response)
-        if (Response['msg'] === 'success') {
-            return true
-        } else {
-            return false
-        }
-    }
-    catch (err){
-        console.log(err)
-        return false
-    }
-}
-
-/*
-*   request: segmentation
-*   url: /segmentation
-*
-* */
-export const RequestSegmentation = (workpiece: string) => {
-    try{
-        const formData = new FormData()
-        const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/segmentation'
-        xlr.open("POST", tarUrl, false)
-        formData.append('filename', workpiece)
-        formData.append('seg_type', 'seg1')
-        xlr.send(formData)
-        const Response = JSON.parse(xlr.response)
-        if (Response['msg'] === 'success') {
-            return true
-        } else {
-            return false
-        }
-    }
-    catch (err){
-        console.log(err)
-        return false
-    }
-}
-
-/*
-*   request: pose estimation alg1
-*   url: /pose_estimation_alg1
-*
-* */
-export const RequestAlg1 = (workpiece: string) => {
-    try{
-        const formData = new FormData()
-        const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/segmentation'
-        xlr.open("POST", tarUrl, false)
-        formData.append('filename', workpiece)
-        formData.append('seg_type', 'seg1')
-        xlr.send(formData)
-        const Response = JSON.parse(xlr.response)
-        if (Response['msg'] === 'success') {
-            return true
-        } else {
-            return false
-        }
-    }
-    catch (err){
-        console.log(err)
-        return false
-    }
-}
-
-
 
 /*
 *   request: send work lines
@@ -179,7 +128,7 @@ export const RequestWorklines = (workpiece:string, worklines: string | string[])
 *   request: far camera => take photo
 *       legacy: cmd 1203
 * */
-export const RequestAli = (workpiece:string) =>{
+export const RequestCamera = (workpiece:string) =>{
     try{
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
