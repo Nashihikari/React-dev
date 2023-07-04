@@ -6,7 +6,7 @@ import {NavigateFunction, Outlet, useNavigate, useLocation } from "react-router-
 const { Header} = Layout;
 
 // header
-const itemsLabel1:string[] = ['机器人', '焊接', '相机']
+const itemsLabel1:string[] = ['机器人', '焊接']
 const items1: MenuProps['items'] = ['/robot', '/weld', '/camera'].map(
     (key,index) => (
         {

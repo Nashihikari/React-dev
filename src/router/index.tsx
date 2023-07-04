@@ -51,11 +51,11 @@ const routes = [
             {
                 path:"/weld",
                 element:withLoadingComponent(<Weld />)
-            },
-            {
-                path:"/camera",
-                element:withLoadingComponent(<Camera />)
             }
+//             {
+//                 path:"/camera",
+//                 element:withLoadingComponent(<Camera />)
+//             }
         ]
     },
     {

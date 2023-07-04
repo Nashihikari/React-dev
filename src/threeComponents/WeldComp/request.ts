@@ -1,34 +1,3 @@
-import fs from 'fs'
-/*
-*   request: use R1
-*       legacy: cmd 1105
-* */
-const RequestR1 = (workpiece:string)=>{
-    try{
-        const formData = new FormData()
-        const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/'
-        // 同步请求
-        xlr.open("POST", tarUrl, false)
-        formData.append('filename', workpiece)
-        const cmdHead = '/f/bIII1III1105III'
-        const data = 'get transform matrix'
-        const len = '4'
-        const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
-        formData.append('cmd', sendCmd)
-        xlr.send(formData)
-        const Response = JSON.parse(xlr.response)
-        console.log(Response)
-        if (Response['Matrix']) {
-            return Response['Matrix']
-        } else {
-            return false
-        }
-    }catch (err){
-        console.log(err)
-        return false
-    }
-}
 
 /*
 *   request: send workpiece
@@ -71,10 +40,15 @@ export const RequestMoveFarShotAndTakePhoto = (workpiece: string) => {
         const tarUrl = 'http://127.0.0.1:3010/move_far_shot_and_take_photo'
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
+        // 预留相机参数设置
+        formData.append('name', 'far')
+        formData.append('exposure_time', '80')
+        formData.append('auto_exposure', 'True')
+        formData.append('target_light', '50')
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
         if (Response['msg'] === 'success') {
-            return true
+            return RequestSegmentation(workpiece)
         } else {
             return false
         }
@@ -90,18 +64,19 @@ export const RequestMoveFarShotAndTakePhoto = (workpiece: string) => {
 *   url: /segmentation
 *
 * */
-export const RequestSegmentation = (workpiece: string) => {
+// @ts-ignore
+const RequestSegmentation = (workpiece: string, seg_type:string='seg1', name:string='default', save_dir:string=null) => {
     try{
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
         const tarUrl = 'http://127.0.0.1:3010/segmentation'
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
-        formData.append('seg_type', 'seg1')
+
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
         if (Response['msg'] === 'success') {
-            return true
+            return Response
         } else {
             return false
         }
@@ -113,58 +88,56 @@ export const RequestSegmentation = (workpiece: string) => {
 }
 
 /*
-*   request: pose estimation alg1
-*   url: /pose_estimation_alg1
-*
+*   request: use R1
+*       /pose_estimation_alg1
 * */
-export const RequestAlg1 = (workpiece: string) => {
+export const RequestR1 = (workpiece:string, name='far')=>{
     try{
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/segmentation'
+        const tarUrl = 'http://127.0.0.1:3010/pose_estimation_alg1'
+        // 同步请求
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
-        formData.append('seg_type', 'seg1')
+        formData.append('name', name)
+        formData.append('model_name_base', workpiece.split('.')[0])
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
-        if (Response['msg'] === 'success') {
-            return true
+        console.log(Response)
+        if (Response['Matrix']) {
+            return Response
         } else {
             return false
         }
-    }
-    catch (err){
+    }catch (err){
         console.log(err)
         return false
     }
 }
-
-
 
 /*
 *   request: send work lines
-*       legacy: cmd 1107
+*       /upload_work_lines
 * */
 export const RequestWorklines = (workpiece:string, worklines: string | string[]) =>{
     try{
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/cmd'
+        const tarUrl = 'http://127.0.0.1:3010/upload_work_lines'
         // 同步请求
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
-        const cmdHead = '/f/bIII1III1107III'
+        formData.append('model_name_base', workpiece.split('.')[0])
+
         let numArr:string[] = []
         for (let i = 0; i < worklines.length; i+=2){
             numArr.push(worklines[i])
         }
         const data = numArr.toString()
-        const len = '4'
-        const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
-        formData.append('cmd', sendCmd)
+        formData.append('work_lines', data)
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
-        if (Response['result'] === 'success'){
+        if (Response['msg'] === 'success'){
             return true
         }else{
             return false
@@ -175,58 +148,22 @@ export const RequestWorklines = (workpiece:string, worklines: string | string[])
         return false
     }
 }
-/*
-*   request: far camera => take photo
-*       legacy: cmd 1203
-* */
-export const RequestAli = (workpiece:string) =>{
-    try{
-        const formData = new FormData()
-        const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/cmd'
-        // 同步请求
-        xlr.open("POST", tarUrl, false)
-        formData.append('filename', workpiece)
-        const cmdHead = '/f/bIII1III1203III'
 
-        const data = 'far camera'
-        const len = '4'
-        const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
-        formData.append('cmd', sendCmd)
-        xlr.send(formData)
-        const Response = JSON.parse(xlr.response)
-        if (Response['result'] === 'success'){
-            return RequestR1(workpiece)
-        }else{
-            return false
-        }
-    }
-    catch (err){
-        console.log(err)
-        return false
-    }
-}
 /*
 *   request: run robot => weld
-*       legacy:
+*
 * */
-export const RequestWeld = (workpiece:string) =>{
+export const RequestWeld = (workpiece:string) => {
     try{
         const formData = new FormData()
         const xlr = new XMLHttpRequest()
-        const tarUrl = 'http://127.0.0.1:3010/cmd'
+        const tarUrl = 'http://127.0.0.1:3010/execute_welding'
         // 同步请求
         xlr.open("POST", tarUrl, false)
         formData.append('filename', workpiece)
-        const cmdHead = '/f/bIII1III1205III'
-
-        const data = 'run robot'
-        const len = '4'
-        const sendCmd = cmdHead + len + 'III' + data + 'III/b/f'
-        formData.append('cmd', sendCmd)
         xlr.send(formData)
         const Response = JSON.parse(xlr.response)
-        if (Response['result'] === 'success'){
+        if (Response['msg'] === 'success'){
 
         }else{
             return false
